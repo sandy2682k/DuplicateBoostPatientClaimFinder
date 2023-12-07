@@ -1,0 +1,27 @@
+// Apex class to handle logic related to Boost Patient Claims
+public with sharing class BoostPatientClaimController {
+    
+    // AuraEnabled method to find duplicate Boost Patient Claims based on the provided name
+    @AuraEnabled(cacheable=true)
+    public static List<Boost_Patient_Claim__c> findDuplicateBoostPatientClaims(String name) {
+        
+        // Validate input: Name must not be null
+        if (name == null) {
+            throw new IllegalArgumentException('Name must not be null');
+        }
+
+        // List to store duplicate Boost Patient Claims
+        List<Boost_Patient_Claim__c> duplicates = new List<Boost_Patient_Claim__c>();
+
+        try {
+            // Query for Boost Patient Claims with the provided name
+            duplicates = [SELECT Id, Name, First_Name__c, Last_Name__c, LastModifiedDate FROM Boost_Patient_Claim__c WHERE Name = :name ORDER BY LastModifiedDate DESC Limit 49999];
+        } catch (Exception e) {
+            // Log an error message if an exception occurs during the query
+            System.debug('An error occurred while finding duplicate Boost Patient Claims: ' + e.getMessage());
+        }
+
+        // Return the list of duplicate Boost Patient Claims
+        return duplicates;
+    }
+}
